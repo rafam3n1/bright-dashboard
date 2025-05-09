@@ -1,10 +1,35 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+const mysql = require('mysql2/promise');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Conexão com MySQL
+let db;
+(async () => {
+  db = await mysql.createConnection({
+    host: '127.0.0.1',
+    user: 'dash',
+    password: 'Rafajon0207*',
+    database: 'dash',
+    port: 3306
+  });
+  // Criação da tabela (execute manualmente se necessário)
+  // await db.execute(`
+  //   CREATE TABLE IF NOT EXISTS fila (
+  //     id INT PRIMARY KEY,
+  //     tipo VARCHAR(50),
+  //     plano VARCHAR(50),
+  //     data VARCHAR(10),
+  //     hora VARCHAR(10),
+  //     status VARCHAR(20) DEFAULT 'em_fila',
+  //     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  //   );
+  // `);
+})();
 
 // Configurações dos clusters Proxmox
 const proxmoxClusters = [
@@ -112,13 +137,29 @@ app.get('/api/metrics/overview', async (req, res) => {
   }
 });
 
-// Endpoint para receber webhooks do n8n/app (ex: cliente entrou na fila)
-app.post('/api/webhook/queue', (req, res) => {
-  const evento = req.body;
-  // TODO: Processar evento e atualizar métricas em memória ou banco
-  console.log('Webhook recebido:', evento);
-  // Exemplo: evento = { userId, action: 'entered_queue', timestamp }
-  res.status(200).json({ ok: true });
+// Webhook para registrar entrada na fila
+app.post('/api/webhook/queue', async (req, res) => {
+  const evento = { ...req.body, ...req.query };
+  try {
+    await db.execute(
+      'INSERT INTO fila (id, tipo, plano, data, hora, status) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE tipo=VALUES(tipo), plano=VALUES(plano), data=VALUES(data), hora=VALUES(hora), status=VALUES(status)',
+      [evento.id, evento.tipo, evento.plano, evento.data, evento.hora, 'em_fila']
+    );
+    res.status(200).json({ ok: true });
+  } catch (err) {
+    console.error('Erro ao inserir na fila:', err);
+    res.status(500).json({ error: 'Erro ao inserir na fila' });
+  }
+});
+
+// Endpoint para consultar a fila atual
+app.get('/api/metrics/fila', async (req, res) => {
+  try {
+    const [rows] = await db.execute('SELECT * FROM fila WHERE status = ? ORDER BY created_at', ['em_fila']);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao consultar a fila' });
+  }
 });
 
 // Estrutura para endpoints futuros
