@@ -1,0 +1,149 @@
+body {
+  background: #181a20;
+  color: #fff;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  margin: 0;
+}
+
+.dashboard-root {
+  min-height: 100vh;
+  background: #181a20;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 2rem 1rem 2rem;
+  background: linear-gradient(90deg, #a259ff 0%, #38b6ff 100%);
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 4px 24px 0 #0003;
+}
+
+.logo-bright {
+  height: 64px;
+  background: transparent;
+}
+
+.dashboard-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 2px 8px #0006;
+}
+
+.dashboard-main {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.metrics-section h2,
+.alerts-section h2 {
+  color: #a259ff;
+  margin-bottom: 1rem;
+}
+
+.metrics-cards {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.metric-card {
+  background: #23263a;
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  box-shadow: 0 2px 12px #0002;
+  min-width: 200px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.metric-card span {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #38b6ff;
+  margin-top: 0.5rem;
+}
+
+.alert-card {
+  background: #2d1a3a;
+  color: #fff;
+  border-left: 6px solid #a259ff;
+  border-radius: 12px;
+  padding: 1.2rem 2rem;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px #0002;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.refresh-btn {
+  background: linear-gradient(90deg, #a259ff 0%, #38b6ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #0002;
+  transition: filter 0.2s, opacity 0.2s;
+}
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
