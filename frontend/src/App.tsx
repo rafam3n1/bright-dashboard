@@ -16,7 +16,7 @@ function App() {
   async function fetchMetrics() {
     setLoading(true);
     try {
-      const res = await fetch('https://api-proxmox.brightcloudgames.com.br/api/metrics/overview');
+      const res = await fetch('http://localhost:3001/api/metrics/overview');
       const data = await res.json();
       setMetrics(data);
     } catch (err) {
@@ -27,7 +27,7 @@ function App() {
 
   async function fetchFila() {
     try {
-      const res = await fetch('https://api-proxmox.brightcloudgames.com.br/api/metrics/fila');
+      const res = await fetch('http://localhost:3001/api/metrics/fila');
       const data = await res.json();
       setFila(data);
       console.log('Fila atual:', data);
