@@ -10,6 +10,7 @@ function App() {
     tempoMedioSessao: '--',
     vmsExistentes: '--'
   });
+  const [fila, setFila] = useState<Array<{id: number, tipo: string, plano: string, data: string, hora: string}>>([]);
   const [loading, setLoading] = useState(false);
 
   async function fetchMetrics() {
@@ -24,9 +25,24 @@ function App() {
     setLoading(false);
   }
 
+  async function fetchFila() {
+    try {
+      const res = await fetch('https://api-proxmox.brightcloudgames.com.br/api/metrics/fila');
+      const data = await res.json();
+      setFila(data);
+      console.log('Fila atual:', data);
+    } catch (err) {
+      console.error('Erro ao buscar fila:', err);
+    }
+  }
+
   useEffect(() => {
     fetchMetrics();
-    const interval = setInterval(fetchMetrics, 300000); // Atualiza a cada 5 minutos
+    fetchFila();
+    const interval = setInterval(() => {
+      fetchMetrics();
+      fetchFila();
+    }, 300000); // 5 minutos
     return () => clearInterval(interval);
   }, []);
 
@@ -39,7 +55,7 @@ function App() {
       <main className="dashboard-main">
         <section className="metrics-section">
           <h2>Métricas em tempo real</h2>
-          <button className="refresh-btn" onClick={fetchMetrics} disabled={loading}>
+          <button className="refresh-btn" onClick={() => { fetchMetrics(); fetchFila(); }} disabled={loading}>
             {loading ? 'Atualizando...' : 'Atualizar agora'}
           </button>
           <div className="metrics-cards">
@@ -53,6 +69,20 @@ function App() {
         <section className="alerts-section">
           <h2>Alertas</h2>
           <div className="alert-card">Nenhum alerta no momento.</div>
+        </section>
+        <section className="fila-section">
+          <h2>Fila de Espera</h2>
+          {fila.length === 0 ? (
+            <div className="alert-card">Nenhum cliente na fila.</div>
+          ) : (
+            <div className="fila-list">
+              {fila.map((item) => (
+                <div key={item.id} className="fila-item">
+                  <strong>ID:</strong> {item.id} | <strong>Tipo:</strong> {item.tipo} | <strong>Plano:</strong> {item.plano} | <strong>Data:</strong> {item.data} | <strong>Hora:</strong> {item.hora}
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       </main>
       {/* Comentário: Futuramente, integrar banco de dados para histórico de métricas */}
