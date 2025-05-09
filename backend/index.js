@@ -33,7 +33,7 @@ async function getProxmoxMetrics() {
         timeout: 10000
       });
       const nodes = nodesResp.data.data;
-      // Primeiro, contar VMs existentes (stopped) em todos os nodes online
+      // Contar VMs existentes (todas as VMs, independente do status e do node)
       for (const node of nodes) {
         if (node.status !== 'online') continue;
         try {
@@ -43,26 +43,12 @@ async function getProxmoxMetrics() {
             timeout: 10000
           });
           const vms = vmsResp.data.data;
-          for (const vm of vms) {
-            try {
-              const statusResp = await axios.get(`${cluster.url}/nodes/${node.node}/qemu/${vm.vmid}/status/current`, {
-                headers: { Authorization: `PVEAPIToken=${cluster.token}` },
-                httpsAgent: new (require('https').Agent)({ rejectUnauthorized: false }),
-                timeout: 10000
-              });
-              const status = statusResp.data.data.status;
-              if (status === 'stopped') {
-                vmsExistentes++;
-              }
-            } catch (err) {
-              console.error(`Erro ao buscar status da VM ${vm.vmid} no node ${node.node}:`, err.message, err.response?.data || err);
-            }
-          }
+          vmsExistentes += vms.length;
         } catch (err) {
           console.error(`Erro ao buscar VMs do node ${node.node}:`, err.message, err.response?.data || err);
         }
       }
-      // Agora, contar maquinasEmUso e nodesDisponiveis apenas nos nodes jogáveis
+      // Contar maquinasEmUso e nodesDisponiveis apenas nos nodes jogáveis
       for (const node of nodes) {
         if (node.status !== 'online') continue;
         if (node.node === 'BCG0' || node.node === 'BCG3') continue; // Ignora nodes não jogáveis
