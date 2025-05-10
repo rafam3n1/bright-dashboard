@@ -112,6 +112,20 @@ app.get('/api/metrics/overview', async (req, res) => {
   }
 });
 
+// Endpoint para fila de espera (mock inicial)
+app.get('/api/metrics/fila', (req, res) => {
+  // TODO: Integrar com banco de dados para histórico real
+  res.json([
+    {
+      id: 1,
+      tipo: "Jogador",
+      plano: "Premium",
+      data: "2024-03-20",
+      hora: "14:30"
+    }
+  ]);
+});
+
 // Endpoint para receber webhooks do n8n/app (ex: cliente entrou na fila)
 app.post('/api/webhook/queue', (req, res) => {
   const evento = req.body;
