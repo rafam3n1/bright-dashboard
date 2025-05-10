@@ -2,6 +2,14 @@ import './App.css'
 import logoBright from './assets/Logo-rebeca-brightbranca.png'
 import { useEffect, useState } from 'react'
 
+type FilaItem = {
+  id: number;
+  tipo: string;
+  plano: string;
+  data: string;
+  hora: string;
+};
+
 function App() {
   const [metrics, setMetrics] = useState({
     maquinasEmUso: '--',
@@ -10,13 +18,13 @@ function App() {
     tempoMedioSessao: '--',
     vmsExistentes: '--'
   });
-  const [fila, setFila] = useState<Array<{id: number, tipo: string, plano: string, data: string, hora: string}>>([]);
   const [loading, setLoading] = useState(false);
+  const [fila, setFila] = useState<FilaItem[]>([]);
 
   async function fetchMetrics() {
     setLoading(true);
     try {
-      const res = await fetch('http://181.215.135.123:3001/api/metrics/overview');
+      const res = await fetch('https://api-proxmox.brightcloudgames.com.br/api/metrics/overview');
       const data = await res.json();
       setMetrics(data);
     } catch (err) {
@@ -27,7 +35,7 @@ function App() {
 
   async function fetchFila() {
     try {
-      const res = await fetch('http://181.215.135.123:3001/api/metrics/fila');
+      const res = await fetch('https://api-proxmox.brightcloudgames.com.br/api/metrics/fila');
       const data = await res.json();
       setFila(data);
       console.log('Fila atual:', data);
@@ -71,18 +79,20 @@ function App() {
           <div className="alert-card">Nenhum alerta no momento.</div>
         </section>
         <section className="fila-section">
-          <h2>Fila de Espera</h2>
-          {fila.length === 0 ? (
-            <div className="alert-card">Nenhum cliente na fila.</div>
-          ) : (
-            <div className="fila-list">
-              {fila.map((item) => (
-                <div key={item.id} className="fila-item">
-                  <strong>ID:</strong> {item.id} | <strong>Tipo:</strong> {item.tipo} | <strong>Plano:</strong> {item.plano} | <strong>Data:</strong> {item.data} | <strong>Hora:</strong> {item.hora}
-                </div>
-              ))}
-            </div>
-          )}
+          <h2>Pessoas na fila</h2>
+          <div className="fila-list">
+            {fila.length === 0 ? (
+              <div className="alert-card">Nenhuma pessoa na fila.</div>
+            ) : (
+              <ul>
+                {fila.map((item) => (
+                  <li key={item.id}>
+                    <strong>ID:</strong> {item.id} | <strong>Tipo:</strong> {item.tipo} | <strong>Plano:</strong> {item.plano} | <strong>Data:</strong> {item.data} | <strong>Hora:</strong> {item.hora}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </section>
       </main>
       {/* Comentário: Futuramente, integrar banco de dados para histórico de métricas */}
